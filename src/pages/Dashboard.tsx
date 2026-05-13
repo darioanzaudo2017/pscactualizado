@@ -17,7 +17,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [filtros, setFiltros] = useState({ desde: '', hasta: '' });
   const [searchTerm, setSearchTerm] = useState('');
-  const { data, loading, error } = useDashboard(filtros);
+  const { data, loading } = useDashboard(filtros);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

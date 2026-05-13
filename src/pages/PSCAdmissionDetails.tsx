@@ -10,14 +10,14 @@ import {
   History,
   X,
   User,
-  AlertTriangle,
   Briefcase,
   ClipboardList,
   Phone,
   ShieldAlert,
-  Edit2,
-  Settings
+  Edit2
 } from 'lucide-react';
+
+interface PSCAdmissionDetailsProps {}
 
 interface Hotel {
   id: string | number;
@@ -305,6 +305,7 @@ const PSCAdmissionDetails: React.FC<PSCAdmissionDetailsProps> = () => {
         .order('nombre', { ascending: true });
       
       setHoteles(hotelsData || []);
+    } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);

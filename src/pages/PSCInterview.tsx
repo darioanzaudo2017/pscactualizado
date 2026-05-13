@@ -198,19 +198,6 @@ const PSCInterview = () => {
     }
   };
 
-  const handleToggleConsumo = (item: string) => {
-    const current = formData.tiempo_consumo || '';
-    const items = current ? current.split(', ') : [];
-    
-    let newItems;
-    if (items.includes(item)) {
-      newItems = items.filter((i: string) => i !== item);
-    } else {
-      newItems = [...items, item];
-    }
-    
-    setFormData(prev => ({ ...prev, tiempo_consumo: newItems.join(', ') }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
