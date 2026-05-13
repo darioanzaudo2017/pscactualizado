@@ -84,6 +84,7 @@ const PSCInterview = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('situacion');
   const [personName, setPersonName] = useState('');
+  const [hoteles, setHoteles] = useState<any[]>([]);
   
   const [formData, setFormData] = useState<InterviewData>({
     id_psc: parseInt(id || '0'),
@@ -182,6 +183,15 @@ const PSCInterview = () => {
           });
         }
       }
+
+      // 3. Fetch Hotels
+      const { data: hotelsData } = await supabase
+        .from('t_hoteles')
+        .select('*')
+        .eq('activo', true)
+        .order('nombre', { ascending: true });
+      
+      if (hotelsData) setHoteles(hotelsData);
     } catch (err) {
       console.error('Error fetching interview:', err);
     } finally {
@@ -418,12 +428,15 @@ const PSCInterview = () => {
                   {formData.acepta_alojamiento && (
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Alojamiento / Dispositivo Destino</label>
-                      <input
+                      <select
                         name="hotel"
                         value={formData.hotel}
                         onChange={handleInputChange}
                         className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 font-bold text-slate-800 focus:ring-4 focus:ring-primary/10 transition-all shadow-inner"
-                      />
+                      >
+                        <option value="">Seleccione Hotel/Dispositivo...</option>
+                        {hoteles.map(h => <option key={h.id} value={h.nombre}>{h.nombre}</option>)}
+                      </select>
                     </div>
                   )}
                   <div className="md:col-span-2">

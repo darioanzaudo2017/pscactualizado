@@ -24,6 +24,8 @@ const PSCList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+  const [hotels, setHotels] = useState<string[]>([]);
+  const [hotelFilter, setHotelFilter] = useState('Hotel (Todos)');
 
   // Debounce search
   useEffect(() => {
@@ -43,15 +45,26 @@ const PSCList: React.FC = () => {
 
   useEffect(() => {
     fetchStats();
+    fetchHotels();
   }, []);
+
+  const fetchHotels = async () => {
+    const { data } = await supabase
+      .from('t_hoteles')
+      .select('nombre')
+      .eq('activo', true)
+      .order('nombre', { ascending: true });
+    
+    if (data) setHotels(data.map(h => h.nombre));
+  };
 
   useEffect(() => {
     fetchPeople();
-  }, [genderFilter, activeOnly, currentPage, debouncedSearch]);
+  }, [genderFilter, hotelFilter, activeOnly, currentPage, debouncedSearch]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [genderFilter, activeOnly, debouncedSearch]);
+  }, [genderFilter, hotelFilter, activeOnly, debouncedSearch]);
 
   const fetchStats = async () => {
     const today = new Date().toISOString().split('T')[0];
@@ -123,6 +136,26 @@ const PSCList: React.FC = () => {
       else if (genderFilter === 'Femenino') query = query.eq('genero', 'Mujer');
       else if (genderFilter === 'No Binario') query = query.in('genero', ['Mujer Trans', 'varon Trans', 'Prefiero no decirlo']);
       else query = query.eq('genero', genderFilter);
+    }
+    
+    // Filtrar por hotel
+    if (hotelFilter !== 'Hotel (Todos)') {
+      // Buscamos los PSC que tienen un ingreso activo en ese hotel
+      const { data: pscInHotel } = await supabase
+        .from('t_ingresos')
+        .select('id_psc, t_hospedaje!inner(hotel)')
+        .eq('activo', true)
+        .eq('finalizado', false)
+        .eq('t_hospedaje.hotel', hotelFilter);
+      
+      const ids = pscInHotel?.map(i => i.id_psc) || [];
+      if (ids.length === 0) {
+        setPeople([]);
+        setTotalCount(0);
+        setLoading(false);
+        return;
+      }
+      query = query.in('id', ids);
     }
     
     // Filtrar por estado activo
@@ -277,6 +310,17 @@ const PSCList: React.FC = () => {
                 </select>
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline pointer-events-none">keyboard_arrow_down</span>
               </div>
+              <div className="relative flex-1">
+                <select 
+                  className="w-full appearance-none bg-white border-none pl-4 pr-10 py-3 rounded-xl shadow-sm font-medium text-sm focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                  value={hotelFilter}
+                  onChange={(e) => setHotelFilter(e.target.value)}
+                >
+                  <option>Hotel (Todos)</option>
+                  {hotels.map(h => <option key={h} value={h}>{h}</option>)}
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline pointer-events-none">keyboard_arrow_down</span>
+              </div>
               <label className="flex items-center gap-3 bg-white px-4 py-3 rounded-xl shadow-sm cursor-pointer hover:bg-slate-50 transition-colors">
                 <span className="text-sm font-medium text-on-surface-variant">Solo activos</span>
                 <div className="relative inline-flex items-center">
@@ -301,15 +345,28 @@ const PSCList: React.FC = () => {
                 <button onClick={() => setActiveOnly(false)} className="material-symbols-outlined text-sm leading-none">close</button>
               </div>
             )}
+            {hotelFilter !== 'Hotel (Todos)' && (
+              <div className="flex items-center gap-2 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full text-sm font-medium">
+                Hotel: {hotelFilter}
+                <button onClick={() => setHotelFilter('Hotel (Todos)')} className="material-symbols-outlined text-sm leading-none">close</button>
+              </div>
+            )}
             <button 
               onClick={() => {
                 setGenderFilter('Género (Todos)');
+                setHotelFilter('Hotel (Todos)');
                 setActiveOnly(true);
               }}
               className="text-primary text-sm font-bold ml-2 hover:underline"
             >
               Restablecer
             </button>
+          </div>
+          
+          <div className="flex items-center justify-between mt-4 px-2">
+            <span className="text-sm font-bold text-on-surface-variant">
+              Resultados encontrados: <span className="text-primary">{totalCount}</span>
+            </span>
           </div>
         </section>
 
