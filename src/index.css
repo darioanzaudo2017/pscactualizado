@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply h-full m-0 p-0;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .bg-login-gradient {
+    background: radial-gradient(circle at top right, #eef1f6 0%, #f7f9fe 100%);
+  }
+  .glass-panel {
+    backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  .primary-gradient {
+    background: linear-gradient(135deg, #003e6f 0%, #005696 100%);
+  }
+  .premium-gradient-btn {
+    background: linear-gradient(135deg, #003e6f 0%, #005696 100%);
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+  }
+  .ghost-border {
+    outline: 1px solid rgba(193, 199, 210, 0.15);
+  }
+  .ambient-shadow {
+    box-shadow: 0 10px 40px -10px rgba(0, 62, 111, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  }
+  .premium-card {
+    @apply bg-white rounded-[32px] p-6 border border-gray-200/50 transition-all duration-300;
+    box-shadow: 0 10px 40px -10px rgba(0, 62, 111, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  }
+  .premium-card:hover {
+    @apply border-gray-200;
+    box-shadow: 0 20px 50px -12px rgba(0, 62, 111, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+  }
+}
